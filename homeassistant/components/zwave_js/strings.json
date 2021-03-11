@@ -47,5 +47,18 @@
       "install_addon": "Please wait while the Z-Wave JS add-on installation finishes. This can take several minutes.",
       "start_addon": "Please wait while the Z-Wave JS add-on start completes. This may take some seconds."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure Z-Wave JS",
+        "data": {
+          "url": "[%key:common::config_flow::data::url%]",
+          "use_addon": "Use the Z-Wave JS Supervisor add-on",
+          "usb_path": "[%key:common::config_flow::data::usb_path%]",
+          "network_key": "Network Key"
+        }
+      }
+    }
   }
 }

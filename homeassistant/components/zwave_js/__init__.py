@@ -295,6 +295,8 @@ async def async_setup_entry(  # noqa: C901
         entry_hass_data[DATA_CONNECT_FAILED_LOGGED] = False
         entry_hass_data[DATA_INVALID_SERVER_VERSION_LOGGED] = False
 
+    unsubscribe_callbacks.append(entry.add_update_listener(update_listener))
+
     services = ZWaveServices(hass, ent_reg)
     services.async_register()
 
@@ -375,6 +377,11 @@ async def async_setup_entry(  # noqa: C901
     entry_hass_data[DATA_START_PLATFORM_TASK] = platform_task
 
     return True
+
+
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Handle options update."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def client_listen(

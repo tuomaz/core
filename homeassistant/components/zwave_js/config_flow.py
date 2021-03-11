@@ -70,6 +70,57 @@ async def async_get_version_info(hass: HomeAssistant, ws_address: str) -> Versio
     return version_info
 
 
+class OptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle an options flow for Z-Wave JS."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Set up the options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Manage the options."""
+        if user_input is not None:
+            use_addon = user_input.get(CONF_USE_ADDON)
+
+            if not use_addon:
+                user_input[CONF_INTEGRATION_CREATED_ADDON] = False
+
+            self.hass.config_entries.async_update_entry(
+                self.config_entry, data={**self.config_entry.data, **user_input}
+            )
+            return self.async_create_entry(title="", data={})
+
+        schema: dict = {
+            vol.Required(
+                CONF_URL,
+                default=self.config_entry.data[CONF_URL],
+            ): str
+        }
+
+        use_addon = self.config_entry.data.get(CONF_USE_ADDON)
+
+        if use_addon:
+            schema[vol.Required(CONF_USE_ADDON, default=use_addon)] = bool
+            schema[
+                vol.Required(
+                    CONF_USB_PATH, default=self.config_entry.data[CONF_USB_PATH]
+                )
+            ] = str
+            schema[
+                vol.Required(
+                    CONF_NETWORK_KEY, default=self.config_entry.data[CONF_NETWORK_KEY]
+                )
+            ] = str
+            schema.pop(CONF_URL)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(schema),
+        )
+
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Z-Wave JS."""
 
@@ -86,6 +137,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.integration_created_addon = False
         self.install_task: asyncio.Task | None = None
         self.start_task: asyncio.Task | None = None
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> OptionsFlowHandler:
+        """Return the options flow."""
+        return OptionsFlowHandler(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None

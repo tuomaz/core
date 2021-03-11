@@ -57,5 +57,18 @@
             }
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "network_key": "Network Key",
+                    "url": "URL",
+                    "usb_path": "USB Device Path",
+                    "use_addon": "Use the Z-Wave JS Supervisor add-on"
+                },
+                "title": "Configure Z-Wave JS"
+            }
+        }
+    },
     "title": "Z-Wave JS"
 }
